@@ -1,47 +1,25 @@
-import ReactFlow, { MarkerType } from "reactflow";
-
+import ReactFlow from "reactflow";
+import useInitializeReacflow from "./utils/initialize-reacflow";
 import "reactflow/dist/style.css";
 
-const initialNodes = [
-  {
-    id: "1",
-    position: { x: 0, y: 0 },
-    data: { label: "1" },
-  },
-  {
-    id: "2",
-    position: { x: 0, y: 100 },
-    data: { label: "2" },
-  },
-  {
-    id: "3",
-    position: { x: 0, y: 200 },
-    data: { label: "3" },
-  },
-];
-const initialEdges = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    markerend: {
-      type: MarkerType.Arrow,
-    },
-  },
-  {
-    id: "e2-3",
-    source: "2",
-    target: "3",
-    markerend: {
-      type: MarkerType.Arrow,
-    },
-  },
-];
-
 export const Chart = () => {
+  const { nodes, edges, onEdgesChange, onNodesChange, handleLayout, onConnect, onConnectStart, onConnectEnd } =
+    useInitializeReacflow();
+
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <ReactFlow nodes={initialNodes} edges={initialEdges} />
+      <button onClick={() => handleLayout()}>Format</button>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onConnectStart={onConnectStart}
+        onConnectEnd={onConnectEnd}
+        fitView
+        snapToGrid
+      />
     </div>
   );
 };

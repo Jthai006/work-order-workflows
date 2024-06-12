@@ -1,10 +1,13 @@
 import { Chart } from "./components/Chart";
 import "./App.css";
+import { ReactFlowProvider } from "reactflow";
 
 function App() {
   return (
     <>
-      <Chart />
+      <ReactFlowProvider>
+        <Chart />
+      </ReactFlowProvider>
     </>
   );
 }
