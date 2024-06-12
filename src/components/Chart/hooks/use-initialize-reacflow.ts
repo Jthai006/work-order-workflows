@@ -6,28 +6,36 @@ import {
   OnConnect,
   OnConnectEnd,
   OnConnectStart,
+  OnNodesDelete,
   addEdge,
+  getConnectedEdges,
+  getIncomers,
+  getOutgoers,
   useEdgesState,
   useNodesState,
   useReactFlow,
 } from "reactflow";
 import Dagre, { Label } from "@dagrejs/dagre";
+import { TaskNode } from "../nodes/task-node/task-node.types";
 
-const initialNodes: Node[] = [
+const initialNodes: TaskNode[] = [
   {
     id: "1",
     position: { x: 0, y: 0 },
     data: { label: "1" },
+    type: "task",
   },
   {
     id: "2",
     position: { x: 0, y: 100 },
     data: { label: "2" },
+    type: "task",
   },
   {
     id: "3",
     position: { x: 0, y: 200 },
     data: { label: "3" },
+    type: "task",
   },
 ];
 const initialEdges = [
@@ -38,6 +46,7 @@ const initialEdges = [
     markerend: {
       type: MarkerType.Arrow,
     },
+    type: "add",
   },
   {
     id: "e2-3",
@@ -46,6 +55,7 @@ const initialEdges = [
     markerend: {
       type: MarkerType.Arrow,
     },
+    type: "add",
   },
 ];
 
@@ -66,7 +76,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction:
       // so it matches the React Flow node anchor point (top left).
       const x = position.x - (node.width || 300) / 2;
       const y = position.y - (node.height || 80) / 2;
-      console.log({ prevX: position.x, prevY: position.y, x, y });
       return { ...node, position: { x, y } };
     }),
     edges,
@@ -105,7 +114,6 @@ export default function useInitializeReacflow() {
 
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
-      console.log(event);
       if (!connectingNodeId.current) return;
 
       // @ts-expect-error classList does exist on event.target
@@ -114,7 +122,7 @@ export default function useInitializeReacflow() {
       if (targetIsPane) {
         // we need to remove the wrapper bounds, in order to get the correct position
         const id = `${new Date().getTime()}`;
-        const newNode = {
+        const newNode: TaskNode = {
           id,
           position: screenToFlowPosition({
             // @ts-expect-error clientX on event
@@ -122,8 +130,8 @@ export default function useInitializeReacflow() {
             // @ts-expect-error clientY on event
             y: event.clientY,
           }),
-          data: { label: `Node ${id}` },
-          origin: [0.5, 0.0],
+          data: { label: `${id}` },
+          type: "task",
         };
 
         setNodes((nds) => nds.concat(newNode));
@@ -131,6 +139,27 @@ export default function useInitializeReacflow() {
       }
     },
     [screenToFlowPosition, setEdges, setNodes],
+  );
+
+  const onNodesDelete: OnNodesDelete = useCallback(
+    (deleted) => {
+      setEdges(
+        deleted.reduce((acc, node) => {
+          const incomers = getIncomers(node, nodes, edges);
+          const outgoers = getOutgoers(node, nodes, edges);
+          const connectedEdges = getConnectedEdges([node], edges);
+
+          const remainingEdges = acc.filter((edge) => !connectedEdges.includes(edge));
+
+          const createdEdges = incomers.flatMap(({ id: source }) =>
+            outgoers.map(({ id: target }) => ({ id: `${source}->${target}`, source, target })),
+          );
+
+          return [...remainingEdges, ...createdEdges];
+        }, edges),
+      );
+    },
+    [setEdges, edges, nodes],
   );
 
   return {
@@ -142,5 +171,6 @@ export default function useInitializeReacflow() {
     onConnect,
     onConnectStart,
     onConnectEnd,
+    onNodesDelete,
   };
 }
