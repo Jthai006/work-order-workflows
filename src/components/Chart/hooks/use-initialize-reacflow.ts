@@ -15,7 +15,7 @@ import {
   useReactFlow,
 } from "reactflow";
 import Dagre, { Label } from "@dagrejs/dagre";
-import { TaskNode, TaskStatus } from "../nodes/task-node/task-node.types";
+import { TaskNode, TaskNodeData, TaskStatus } from "../nodes/task-node/task-node.types";
 import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
 
 const initialNodes: TaskNode[] = [
@@ -156,7 +156,7 @@ export default function useInitializeReacflow() {
           data: {
             label: `${id}`,
             isComplete: false,
-            taskStatus: getDownstreamTaskStatus(connectingNode.data.taskStatus),
+            taskStatus: getDownstreamTaskStatus([connectingNode.data.taskStatus]),
           },
           type: "task",
         };
@@ -170,23 +170,55 @@ export default function useInitializeReacflow() {
 
   const onNodesDelete: OnNodesDelete = useCallback(
     (deleted) => {
-      setEdges(
-        deleted.reduce((acc, node) => {
-          const incomers = getIncomers(node, nodes, edges);
-          const outgoers = getOutgoers(node, nodes, edges);
-          const connectedEdges = getConnectedEdges([node], edges);
+      const downstreamNodeIds: string[] = [];
+      const updatedEdges: Edge[] = deleted.reduce((acc, node) => {
+        const incomers = getIncomers(node, nodes, edges);
+        const outgoers = getOutgoers(node, nodes, edges);
+        downstreamNodeIds.push(...outgoers.map(({ id }) => id));
+        const connectedEdges = getConnectedEdges([node], edges);
 
-          const remainingEdges = acc.filter((edge) => !connectedEdges.includes(edge));
+        const remainingEdges = acc.filter((edge) => !connectedEdges.includes(edge));
 
-          const createdEdges = incomers.flatMap(({ id: source }) =>
-            outgoers.map(({ id: target }) => ({ id: `${source}->${target}`, source, target, type: "add" })),
-          );
+        const createdEdges = incomers.flatMap(({ id: source }) =>
+          outgoers.map(({ id: target }) => {
+            const targetNode = getNode(target);
+            if (!targetNode) {
+              throw new Error(`onNodesDelete - Could not find node ${targetNode}`);
+            }
 
-          return [...remainingEdges, ...createdEdges];
-        }, edges),
+            return {
+              id: `${source}->${target}`,
+              source,
+              target,
+              type: targetNode.data.taskStatus !== TaskStatus.COMPLETE ? "add" : undefined,
+            };
+          }),
+        );
+
+        return [...remainingEdges, ...createdEdges];
+      }, edges);
+      setEdges(updatedEdges);
+
+      setNodes((nodes) =>
+        nodes.map((node) => {
+          if (downstreamNodeIds.includes(node.id)) {
+            const upstreamNodes = getIncomers<TaskNodeData>(node, nodes, updatedEdges);
+            const upstreamNodesTaskStatuses = upstreamNodes.map(({ data }) => data.taskStatus);
+            const taskStatus = getDownstreamTaskStatus(upstreamNodesTaskStatuses);
+
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                taskStatus,
+              },
+            };
+          }
+          return node;
+        }),
       );
     },
-    [setEdges, edges, nodes],
+    [setEdges, edges, setNodes, nodes, getNode],
   );
 
   return {

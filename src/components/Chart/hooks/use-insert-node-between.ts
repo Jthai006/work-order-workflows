@@ -67,7 +67,7 @@ export default function useInsertNodeBetween() {
             data: {
               label: newNodeId,
               isComplete: false,
-              taskStatus: getDownstreamTaskStatus(sourceNode.data.taskStatus),
+              taskStatus: getDownstreamTaskStatus([sourceNode.data.taskStatus]),
             },
             position: { x: targetNode.position.x, y: targetNode.position.y },
           } as TaskNode,
