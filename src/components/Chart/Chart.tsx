@@ -16,18 +16,25 @@ export const Chart = () => {
   const {
     nodes,
     edges,
+    updatedAt,
     onEdgesChange,
     onNodesChange,
-    handleLayout,
+    onLayout,
     onConnect,
     onConnectStart,
     onConnectEnd,
     onNodesDelete,
+    onReset,
   } = useInitializeReacflow();
 
   return (
     <div style={{ height: "100%" }}>
-      <button onClick={() => handleLayout()}>Format</button>
+      <div className="flex justify-center w-full">
+        <button onClick={onLayout}>Format</button>
+        <div className="pr-1"></div>
+        <button onClick={onReset}>Reset</button>
+      </div>
+      <small>Last save: {updatedAt}</small>
       <ReactFlow
         nodes={nodes}
         edges={edges}

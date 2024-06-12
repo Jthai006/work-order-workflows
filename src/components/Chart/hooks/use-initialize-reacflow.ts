@@ -17,43 +17,7 @@ import {
 import Dagre, { Label } from "@dagrejs/dagre";
 import { TaskNode, TaskNodeData, TaskStatus } from "../nodes/task-node/task-node.types";
 import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
-
-const initialNodes: TaskNode[] = [
-  {
-    id: "1",
-    position: { x: 0, y: 0 },
-    data: { label: "1", isComplete: false, taskStatus: TaskStatus.ACTIVE },
-    type: "task",
-  },
-  {
-    id: "2",
-    position: { x: 0, y: 100 },
-    data: { label: "2", isComplete: false, taskStatus: TaskStatus.INACTIVE },
-    type: "task",
-  },
-  {
-    id: "3",
-    position: { x: 0, y: 200 },
-    data: { label: "3", isComplete: false, taskStatus: TaskStatus.INACTIVE },
-    type: "task",
-  },
-];
-const initialEdges = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-
-    type: "add",
-  },
-  {
-    id: "e2-3",
-    source: "2",
-    target: "3",
-
-    type: "add",
-  },
-];
+import { initialEdges, initialNodes } from "../config";
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction: string }) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
@@ -109,7 +73,7 @@ export default function useInitializeReacflow() {
   }, [nodes, edges, toObject]);
 
   // Callbacks
-  const handleLayout = useCallback(() => {
+  const onLayout = useCallback(() => {
     const layouted = getLayoutedElements(nodes, edges, { direction: "TB" });
 
     setNodes([...layouted.nodes]);
@@ -119,6 +83,12 @@ export default function useInitializeReacflow() {
       fitView();
     });
   }, [nodes, edges, setNodes, setEdges, fitView]);
+
+  const onReset = useCallback(() => {
+    localStorage.removeItem("custom-flow");
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [setEdges, setNodes]);
 
   const onConnect: OnConnect = useCallback(
     (params) => {
@@ -224,13 +194,14 @@ export default function useInitializeReacflow() {
   return {
     nodes,
     edges,
+    updatedAt: updatedAt ? new Date(updatedAt).toString() : "N/a",
     onNodesChange,
     onEdgesChange,
-    handleLayout,
+    onLayout,
     onConnect,
     onConnectStart,
     onConnectEnd,
     onNodesDelete,
-    updatedAt: updatedAt ? new Date(updatedAt).toString() : "N/a",
+    onReset,
   };
 }
