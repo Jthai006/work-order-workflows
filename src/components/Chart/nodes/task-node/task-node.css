@@ -5,31 +5,63 @@
   border-color: blue;
 }
 .react-flow__node-task {
-  padding: 10px;
-  border-radius: 3px;
-  width: 150px;
+  border-radius: 4px;
+  width: 200px;
+  height: 50px;
   font-size: 12px;
   color: #222;
   text-align: center;
   border-width: 1px;
   border-style: solid;
   border-color: #1a192b;
-  background-color: white;
 }
-
-.delete-btn {
+.action-container {
+  border-radius: 0px 3px 3px 0px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+}
+.action-btn {
   background-color: unset;
   border: unset;
   padding: unset;
-  position: absolute;
-  right: 0;
+  outline: unset;
+}
+.action-btn:focus {
+  outline: unset;
+}
+.delete-btn {
   color: #ff7b7b;
 }
 .delete-btn:hover {
-  background-color: unset;
-  border: unset;
-  padding: unset;
-  position: absolute;
-  right: 0;
   color: #ff0000;
+}
+.edit-btn-confirm {
+  color: rgb(13 148 136);
+}
+.edit-btn-confirm:hover {
+  color: rgb(20 184 166);
+}
+.edit-btn {
+  color: gray;
+}
+.edit-btn:hover {
+  color: black;
+}
+.complete-btn {
+  color: rgb(13 148 136);
+}
+.complete-btn:hover {
+  color: rgb(20 184 166);
+}
+
+.label-input {
+  background: white;
+  border: 1px solid gray;
+  width: 50%;
+  border-radius: 3px;
+  font-size: x-small;
 }

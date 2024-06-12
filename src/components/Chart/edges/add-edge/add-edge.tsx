@@ -52,7 +52,7 @@ const AddEdge = memo(
           requiredExtensions="http://www.w3.org/1999/xhtml"
         >
           <div className="flex justify-center items-center h-full">
-            <button className="addButton" onClick={handleInsertNode}>
+            <button className="add-button" onClick={handleInsertNode}>
               <i className="fa-solid fa-circle-plus"></i>
             </button>
           </div>

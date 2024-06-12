@@ -16,25 +16,25 @@ import {
   useReactFlow,
 } from "reactflow";
 import Dagre, { Label } from "@dagrejs/dagre";
-import { TaskNode } from "../nodes/task-node/task-node.types";
+import { TaskNode, TaskStatus } from "../nodes/task-node/task-node.types";
 
 const initialNodes: TaskNode[] = [
   {
     id: "1",
     position: { x: 0, y: 0 },
-    data: { label: "1" },
+    data: { label: "1", isComplete: false, taskStatus: TaskStatus.ACTIVE },
     type: "task",
   },
   {
     id: "2",
     position: { x: 0, y: 100 },
-    data: { label: "2" },
+    data: { label: "2", isComplete: false, taskStatus: TaskStatus.INACTIVE },
     type: "task",
   },
   {
     id: "3",
     position: { x: 0, y: 200 },
-    data: { label: "3" },
+    data: { label: "3", isComplete: false, taskStatus: TaskStatus.INACTIVE },
     type: "task",
   },
 ];
@@ -133,7 +133,7 @@ export default function useInitializeReacflow() {
             // @ts-expect-error clientY on event
             y: event.clientY,
           }),
-          data: { label: `${id}` },
+          data: { label: `${id}`, isComplete: false, taskStatus: TaskStatus.INACTIVE },
           type: "task",
         };
 

@@ -1,5 +1,7 @@
 import { useCallback } from "react";
-import { Node, useReactFlow } from "reactflow";
+import { useReactFlow } from "reactflow";
+import { TaskNode, TaskStatus } from "../nodes/task-node/task-node.types";
+import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
 
 export default function useInsertNodeBetween() {
   const { getEdge, getNode, getEdges, setNodes, setEdges } = useReactFlow();
@@ -8,6 +10,7 @@ export default function useInsertNodeBetween() {
     (initialNodeId: string): string[] => {
       const edges = getEdges();
       const startingEdges = edges.filter(({ source }) => source === initialNodeId);
+
       if (!startingEdges.length) {
         return [initialNodeId];
       }
@@ -21,34 +24,60 @@ export default function useInsertNodeBetween() {
     (sourceNodeId: string, targetNodeId: string, edgeId: string) => {
       const newNodeId = `${new Date().getTime()}`;
       const downstreamNodes = getDownstreamNodes(targetNodeId);
+      const targetNode = getNode(targetNodeId);
+      const sourceNode = getNode(sourceNodeId);
+
+      if (!targetNode) {
+        throw new Error(`insertNode - Unable to find targetNode: ${targetNodeId}`);
+      }
+      if (!sourceNode) {
+        throw new Error(`insertNode - Unable to find sourceNode: ${sourceNodeId}`);
+      }
 
       setNodes((nodes) => {
-        const targetNode = getNode(targetNodeId);
         return [
-          ...nodes.map((node) =>
-            downstreamNodes.includes(node.id)
-              ? {
-                  ...node,
-                  position: {
-                    x: node.position.x,
-                    y: node.position.y + 100,
-                  },
-                }
-              : node,
-          ),
+          ...nodes.map((node) => {
+            if (node.id === targetNode.id) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  taskStatus: TaskStatus.INACTIVE,
+                },
+                position: {
+                  x: node.position.x,
+                  y: node.position.y + 100,
+                },
+              };
+            }
+            if (downstreamNodes.includes(node.id)) {
+              return {
+                ...node,
+                position: {
+                  x: node.position.x,
+                  y: node.position.y + 100,
+                },
+              };
+            }
+            return node;
+          }),
           {
             id: newNodeId,
             type: "task",
-            data: { label: newNodeId },
-            position: { x: targetNode?.position.x, y: targetNode?.position.y },
-          } as Node,
+            data: {
+              label: newNodeId,
+              isComplete: false,
+              taskStatus: getDownstreamTaskStatus(sourceNode.data.taskStatus),
+            },
+            position: { x: targetNode.position.x, y: targetNode.position.y },
+          } as TaskNode,
         ];
       });
 
-      const edges = getEdges();
       const edge = getEdge(edgeId);
+
       if (!edge) {
-        throw new Error(`handleAddNode - Unable to find edge ${edgeId}`);
+        throw new Error(`insertNode - Unable to find edge ${edgeId}`);
       }
 
       const updatedEdge = {
@@ -56,7 +85,7 @@ export default function useInsertNodeBetween() {
         source: newNodeId,
         id: `${newNodeId}->${edge.target}`,
       };
-      const remainingEdges = edges.filter((e) => edge.id !== e.id);
+
       const newEdge = {
         id: `${sourceNodeId}->${newNodeId}`,
         source: sourceNodeId,
@@ -64,9 +93,9 @@ export default function useInsertNodeBetween() {
         type: "add",
       };
 
-      setEdges([...remainingEdges, updatedEdge, newEdge]);
+      setEdges((prevEdges) => [...prevEdges.filter((e) => e.id !== edge.id), updatedEdge, newEdge]);
     },
-    [getDownstreamNodes, setNodes, getEdges, getEdge, setEdges, getNode],
+    [getDownstreamNodes, getNode, setNodes, getEdge, setEdges],
   );
 
   return insertNode;
