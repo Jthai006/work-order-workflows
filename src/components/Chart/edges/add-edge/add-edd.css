@@ -1,0 +1,12 @@
+.addButton {
+  padding: unset;
+  border: unset;
+  background-color: #242424;
+  color: #3572ef;
+}
+.addButton:hover {
+  color: #3abef9;
+}
+.addButton:focus {
+  outline: unset;
+}
