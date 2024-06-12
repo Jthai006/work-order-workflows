@@ -21,7 +21,7 @@ export const Chart = () => {
   } = useInitializeReacflow();
   console.log(edges);
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div style={{ height: "100%" }}>
       <button onClick={() => handleLayout()}>Format</button>
       <ReactFlow
         nodes={nodes}
