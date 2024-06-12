@@ -59,13 +59,16 @@ const initialEdges = [
   },
 ];
 
-const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-
 const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction: string }) => {
+  const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
   g.setGraph({ rankdir: options.direction });
 
-  edges.forEach((edge) => g.setEdge(edge.source, edge.target));
-  nodes.forEach((node) => g.setNode(node.id, node as Label));
+  edges.forEach((edge) => {
+    g.setEdge(edge.source, edge.target);
+  });
+  nodes.forEach((node) => {
+    return g.setNode(node.id, { height: node.height, width: node.width } as Label);
+  });
 
   Dagre.layout(g);
 
@@ -135,7 +138,7 @@ export default function useInitializeReacflow() {
         };
 
         setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) => [...eds].concat({ id, source: connectingNodeId.current, target: id } as Edge));
+        setEdges((eds) => [...eds].concat({ id, source: connectingNodeId.current, target: id, type: "add" } as Edge));
       }
     },
     [screenToFlowPosition, setEdges, setNodes],
