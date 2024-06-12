@@ -46,6 +46,8 @@ const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
 
   const editButtonClasses = isEditing ? "action-btn edit-btn-confirm" : "action-btn edit-btn";
 
+  const disableComplete = data.taskStatus !== TaskStatus.ACTIVE;
+
   return (
     <>
       <Handle type="target" position={Position.Top} style={{ background: "#555" }} />
@@ -60,7 +62,7 @@ const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
               <i className="fa-solid fa-pen-to-square"></i>
             </button>
             <div className="pr-1"></div>
-            <button className="action-btn complete-btn" onClick={handleComplete}>
+            <button className="action-btn complete-btn" onClick={handleComplete} disabled={disableComplete}>
               <i className="fa-solid fa-circle-check"></i>
             </button>
           </div>

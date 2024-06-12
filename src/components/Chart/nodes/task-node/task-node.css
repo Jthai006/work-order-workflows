@@ -54,8 +54,11 @@
 .complete-btn {
   color: rgb(13 148 136);
 }
-.complete-btn:hover {
+.complete-btn:hover:enabled {
   color: rgb(20 184 166);
+}
+.complete-btn:disabled {
+  color: rgb(160, 160, 160);
 }
 
 .label-input {
