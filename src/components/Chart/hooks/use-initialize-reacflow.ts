@@ -1,7 +1,6 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   Edge,
-  MarkerType,
   Node,
   OnConnect,
   OnConnectEnd,
@@ -17,6 +16,7 @@ import {
 } from "reactflow";
 import Dagre, { Label } from "@dagrejs/dagre";
 import { TaskNode, TaskStatus } from "../nodes/task-node/task-node.types";
+import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
 
 const initialNodes: TaskNode[] = [
   {
@@ -43,18 +43,14 @@ const initialEdges = [
     id: "e1-2",
     source: "1",
     target: "2",
-    markerend: {
-      type: MarkerType.Arrow,
-    },
+
     type: "add",
   },
   {
     id: "e2-3",
     source: "2",
     target: "3",
-    markerend: {
-      type: MarkerType.Arrow,
-    },
+
     type: "add",
   },
 ];
@@ -85,13 +81,34 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction:
   };
 };
 
+const getInitialFlow = (): { flow: { nodes: Node[]; edges: Edge[] }; updatedAt: number | null } => {
+  const customFlowJson = localStorage.getItem("custom-flow");
+  if (!customFlowJson) return { flow: { nodes: initialNodes, edges: initialEdges }, updatedAt: null };
+
+  try {
+    const parsedFlow = JSON.parse(customFlowJson);
+    return parsedFlow;
+  } catch (error) {
+    console.error("Failed to parse custom flow from localStorage", error);
+    return { flow: { nodes: initialNodes, edges: initialEdges }, updatedAt: null };
+  }
+};
+
 export default function useInitializeReacflow() {
-  const { fitView, screenToFlowPosition } = useReactFlow();
+  const { fitView, screenToFlowPosition, toObject, getNode } = useReactFlow();
   const connectingNodeId = useRef<string | null>(null);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { flow, updatedAt } = getInitialFlow();
+  const [nodes, setNodes, onNodesChange] = useNodesState(flow.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(flow.edges);
 
+  // Effects
+  // Handle auto saving of flow
+  useEffect(() => {
+    localStorage.setItem("custom-flow", JSON.stringify({ flow: toObject(), updatedAt: new Date().getTime() }));
+  }, [nodes, edges, toObject]);
+
+  // Callbacks
   const handleLayout = useCallback(() => {
     const layouted = getLayoutedElements(nodes, edges, { direction: "TB" });
 
@@ -118,9 +135,12 @@ export default function useInitializeReacflow() {
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
       if (!connectingNodeId.current) return;
+      const connectingNode = getNode(connectingNodeId.current);
+      if (!connectingNode) {
+        throw new Error(`onConnectEnd - Could not find node ${connectingNodeId.current}`);
+      }
 
-      // @ts-expect-error classList does exist on event.target
-      const targetIsPane = event.target?.classList.contains("react-flow__pane");
+      const targetIsPane = (event.target as HTMLElement)?.classList.contains("react-flow__pane");
 
       if (targetIsPane) {
         // we need to remove the wrapper bounds, in order to get the correct position
@@ -133,7 +153,11 @@ export default function useInitializeReacflow() {
             // @ts-expect-error clientY on event
             y: event.clientY,
           }),
-          data: { label: `${id}`, isComplete: false, taskStatus: TaskStatus.INACTIVE },
+          data: {
+            label: `${id}`,
+            isComplete: false,
+            taskStatus: getDownstreamTaskStatus(connectingNode.data.taskStatus),
+          },
           type: "task",
         };
 
@@ -141,7 +165,7 @@ export default function useInitializeReacflow() {
         setEdges((eds) => [...eds].concat({ id, source: connectingNodeId.current, target: id, type: "add" } as Edge));
       }
     },
-    [screenToFlowPosition, setEdges, setNodes],
+    [getNode, screenToFlowPosition, setEdges, setNodes],
   );
 
   const onNodesDelete: OnNodesDelete = useCallback(
@@ -175,5 +199,6 @@ export default function useInitializeReacflow() {
     onConnectStart,
     onConnectEnd,
     onNodesDelete,
+    updatedAt: updatedAt ? new Date(updatedAt).toString() : "N/a",
   };
 }
