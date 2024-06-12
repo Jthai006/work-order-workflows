@@ -106,7 +106,7 @@ export default function useInitializeReacflow() {
   const onConnect: OnConnect = useCallback(
     (params) => {
       connectingNodeId.current = null;
-      setEdges((eds) => addEdge(params, eds));
+      setEdges((eds) => addEdge({ ...params, type: "add" }, eds));
     },
     [setEdges],
   );
@@ -155,7 +155,7 @@ export default function useInitializeReacflow() {
           const remainingEdges = acc.filter((edge) => !connectedEdges.includes(edge));
 
           const createdEdges = incomers.flatMap(({ id: source }) =>
-            outgoers.map(({ id: target }) => ({ id: `${source}->${target}`, source, target })),
+            outgoers.map(({ id: target }) => ({ id: `${source}->${target}`, source, target, type: "add" })),
           );
 
           return [...remainingEdges, ...createdEdges];
