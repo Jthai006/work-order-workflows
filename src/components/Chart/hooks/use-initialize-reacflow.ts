@@ -177,7 +177,7 @@ export default function useInitializeReacflow() {
           if (downstreamNodeIds.includes(node.id)) {
             const upstreamNodes = getIncomers<TaskNodeData>(node, nodes, updatedEdges);
             const upstreamNodesTaskStatuses = upstreamNodes.map(({ data }) => data.taskStatus);
-            const taskStatus = getDownstreamTaskStatus(upstreamNodesTaskStatuses);
+            const taskStatus = getDownstreamTaskStatus(upstreamNodesTaskStatuses, node.data.taskStatus);
 
             return {
               ...node,
