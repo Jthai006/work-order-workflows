@@ -50,7 +50,7 @@ const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
 
   return (
     <>
-      <Handle type="target" position={Position.Top} style={{ background: "#555" }} />
+      <Handle className="handle" type="target" position={Position.Top} style={{ background: "#555" }} />
       <div
         style={{ backgroundColor: TaskNodeStatusColors[data.taskStatus] }}
         className="flex items-center justify-center relative p-2.5 rounded h-full"
