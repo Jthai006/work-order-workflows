@@ -10,3 +10,9 @@
 .add-button:focus {
   outline: unset;
 }
+
+@media (prefers-color-scheme: light) {
+  .add-button {
+    background-color: white;
+  }
+}

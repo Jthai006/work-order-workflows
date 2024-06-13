@@ -31,11 +31,11 @@ export const Chart = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-center w-full">
-        <button className="p-1 bg-slate-700" onClick={onLayout}>
+        <button className="p-1" onClick={onLayout}>
           Format
         </button>
         <div className="pr-1"></div>
-        <button className="p-1 bg-slate-700" onClick={onReset}>
+        <button className="p-1" onClick={onReset}>
           Reset
         </button>
       </div>
