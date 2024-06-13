@@ -40,6 +40,7 @@ const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
   }, [isEditing, label]);
 
   const editButtonClasses = isEditing ? "action-btn edit-btn-confirm" : "action-btn edit-btn";
+  const editButtonTooltip = isEditing ? "Save Task" : "Edit Task";
 
   const disableComplete = data.taskStatus !== TaskStatus.ACTIVE;
 
@@ -54,15 +55,15 @@ const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
         <div className="action-container">
           <div className="flex">
             <button className={editButtonClasses} onClick={toggleEditing}>
-              <i className="fa-solid fa-pen-to-square"></i>
+              <i data-tooltip={editButtonTooltip} className="fa-solid fa-pen-to-square"></i>
             </button>
             <div className="pr-1"></div>
             <button className="action-btn complete-btn" onClick={handleComplete} disabled={disableComplete}>
-              <i className="fa-solid fa-circle-check"></i>
+              <i data-tooltip="Complete Task" className="fa-solid fa-circle-check"></i>
             </button>
           </div>
           <button className="action-btn delete-btn" onClick={handleDelete}>
-            <i className="fa-solid fa-circle-xmark"></i>
+            <i data-tooltip="Delete Task" className="fa-solid fa-circle-xmark"></i>
           </button>
         </div>
       </div>
