@@ -18,11 +18,11 @@ The Work Order Workflows project is a Vite + React + TypeScript application desi
 
 1. Clone the repository:
 
-   ````sh
+   ```sh
    git clone https://github.com/Jthai006/work-order-workflows.git
-   cd work-order-workflows```
+   cd work-order-workflows
 
-   ````
+   ```
 
 2. Install dependencies:
 
