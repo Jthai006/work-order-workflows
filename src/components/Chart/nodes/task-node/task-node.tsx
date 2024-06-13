@@ -4,6 +4,7 @@ import "./task-node.css";
 import { TaskNodeData, TaskStatus } from "./task-node.types";
 import useCompleteTask from "../../hooks/use-complete-task";
 import { TaskNodeStatusColors } from "../../../../constants";
+import { taskList } from "../../config";
 
 const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -34,9 +35,15 @@ const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
 
   const nodeContent = useMemo(() => {
     if (isEditing) {
-      return <input className="label-input" onChange={(e) => setLabel(e.target.value)} value={label} />;
+      return (
+        <select className="label-input" onChange={(e) => setLabel(e.target.value)} value={label}>
+          {taskList.map((task) => (
+            <option value={task}>{task}</option>
+          ))}
+        </select>
+      );
     }
-    return <div>{label}</div>;
+    return <p>{label}</p>;
   }, [isEditing, label]);
 
   const editButtonClasses = isEditing ? "action-btn edit-btn-confirm" : "action-btn edit-btn";
