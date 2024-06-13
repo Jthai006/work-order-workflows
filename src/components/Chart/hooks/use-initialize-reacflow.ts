@@ -148,6 +148,7 @@ export default function useInitializeReacflow() {
         const connectedEdges = getConnectedEdges([node], edges);
 
         const remainingEdges = acc.filter((edge) => !connectedEdges.includes(edge));
+        const remainingEdgeIds = remainingEdges.map(({ id }) => id);
 
         const createdEdges = incomers.flatMap(({ id: source }) =>
           outgoers.map(({ id: target }) => {
@@ -157,7 +158,7 @@ export default function useInitializeReacflow() {
             }
 
             return {
-              id: `${source}->${target}`,
+              id: `e${source}->${target}`,
               source,
               target,
               type: targetNode.data.taskStatus !== TaskStatus.COMPLETE ? "add" : undefined,
@@ -165,8 +166,11 @@ export default function useInitializeReacflow() {
           }),
         );
 
-        return [...remainingEdges, ...createdEdges];
+        // Needed for case when incomer and outgoer is already connected
+        const filterDuplicateCreatedEdge = createdEdges.filter(({ id }) => !remainingEdgeIds.includes(id));
+        return [...remainingEdges, ...filterDuplicateCreatedEdge];
       }, edges);
+
       setEdges(updatedEdges);
 
       setNodes((nodes) =>

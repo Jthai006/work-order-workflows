@@ -83,11 +83,11 @@ export default function useInsertNodeBetween() {
       const updatedEdge = {
         ...edge,
         source: newNodeId,
-        id: `${newNodeId}->${edge.target}`,
+        id: `e${newNodeId}->${edge.target}`,
       };
 
       const newEdge = {
-        id: `${sourceNodeId}->${newNodeId}`,
+        id: `e${sourceNodeId}->${newNodeId}`,
         source: sourceNodeId,
         target: newNodeId,
         type: "add",
