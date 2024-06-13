@@ -26,9 +26,9 @@ The Work Order Workflows project is a Vite + React + TypeScript application desi
 
 2. Install dependencies:
 
-```
-npm install
-```
+   ```
+   npm install
+   ```
 
 ### Running the Application
 
