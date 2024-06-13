@@ -3,12 +3,7 @@ import { Handle, NodeProps, Position, useReactFlow } from "reactflow";
 import "./task-node.css";
 import { TaskNodeData, TaskStatus } from "./task-node.types";
 import useCompleteTask from "../../hooks/use-complete-task";
-
-const TaskNodeStatusColors = {
-  [TaskStatus.INACTIVE]: "#DDA0DD",
-  [TaskStatus.ACTIVE]: "#a0b2dd",
-  [TaskStatus.COMPLETE]: "#a0dda7",
-};
+import { TaskNodeStatusColors } from "../../../../constants";
 
 const TaskNode = memo(({ id: nodeId, data }: NodeProps<TaskNodeData>) => {
   const [isEditing, setIsEditing] = useState(false);

@@ -3,6 +3,7 @@ import useInitializeReacflow from "./hooks/use-initialize-reacflow";
 import "reactflow/dist/style.css";
 import TaskNode from "./nodes/task-node";
 import AddEdge from "./edges/add-edge";
+import Legend from "../Legend/legend";
 
 const nodeTypes = {
   task: TaskNode,
@@ -28,7 +29,7 @@ export const Chart = () => {
   } = useInitializeReacflow();
 
   return (
-    <div style={{ height: "100%" }}>
+    <div className="h-full flex flex-col">
       <div className="flex justify-center w-full">
         <button className="p-1 bg-slate-700" onClick={onLayout}>
           Format
@@ -38,6 +39,8 @@ export const Chart = () => {
           Reset
         </button>
       </div>
+      <div className="pt-2"></div>
+      <Legend />
       <small>Last save: {updatedAt}</small>
       <ReactFlow
         nodes={nodes}
