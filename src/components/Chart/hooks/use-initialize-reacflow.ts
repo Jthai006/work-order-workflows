@@ -17,7 +17,7 @@ import {
 import Dagre, { Label } from "@dagrejs/dagre";
 import { TaskNode, TaskNodeData, TaskStatus } from "../nodes/task-node/task-node.types";
 import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
-import { initialEdges, initialNodes } from "../config";
+import { getTaskName, initialEdges, initialNodes } from "../config";
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction: string }) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
@@ -124,8 +124,7 @@ export default function useInitializeReacflow() {
             y: event.clientY,
           }),
           data: {
-            label: `${id}`,
-            isComplete: false,
+            label: getTaskName(),
             taskStatus: getDownstreamTaskStatus([connectingNode.data.taskStatus]),
           },
           type: "task",

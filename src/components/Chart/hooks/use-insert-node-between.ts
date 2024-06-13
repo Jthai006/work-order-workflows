@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useReactFlow } from "reactflow";
 import { TaskNode, TaskStatus } from "../nodes/task-node/task-node.types";
 import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
+import { getTaskName } from "../config";
 
 export default function useInsertNodeBetween() {
   const { getEdge, getNode, getEdges, setNodes, setEdges } = useReactFlow();
@@ -65,8 +66,7 @@ export default function useInsertNodeBetween() {
             id: newNodeId,
             type: "task",
             data: {
-              label: newNodeId,
-              isComplete: false,
+              label: getTaskName(),
               taskStatus: getDownstreamTaskStatus([sourceNode.data.taskStatus]),
             },
             position: { x: targetNode.position.x, y: targetNode.position.y },

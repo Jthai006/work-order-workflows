@@ -8,7 +8,6 @@ export enum TaskStatus {
 
 export type TaskNodeData = {
   label: string;
-  isComplete: boolean;
   taskStatus: TaskStatus;
 };
 

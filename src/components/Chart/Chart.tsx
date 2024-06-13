@@ -30,9 +30,13 @@ export const Chart = () => {
   return (
     <div style={{ height: "100%" }}>
       <div className="flex justify-center w-full">
-        <button onClick={onLayout}>Format</button>
+        <button className="p-1 bg-slate-700" onClick={onLayout}>
+          Format
+        </button>
         <div className="pr-1"></div>
-        <button onClick={onReset}>Reset</button>
+        <button className="p-1 bg-slate-700" onClick={onReset}>
+          Reset
+        </button>
       </div>
       <small>Last save: {updatedAt}</small>
       <ReactFlow
