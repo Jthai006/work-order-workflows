@@ -5,16 +5,19 @@ import { useCallback } from "react";
 export default function useGetDownstreamNodes() {
   const { getEdges } = useReactFlow();
 
-  const getDownstreamNodes = (initialNodeId: string): string[] => {
-    const edges = getEdges();
-    const startingEdges = edges.filter(({ source }) => source === initialNodeId);
+  const getDownstreamNodes = useCallback(
+    (initialNodeId: string): string[] => {
+      const edges = getEdges();
+      const startingEdges = edges.filter(({ source }) => source === initialNodeId);
 
-    if (!startingEdges.length) {
-      return [initialNodeId];
-    }
+      if (!startingEdges.length) {
+        return [initialNodeId];
+      }
 
-    return [initialNodeId, ...startingEdges.flatMap(({ target }) => getDownstreamNodes(target))];
-  };
+      return [initialNodeId, ...startingEdges.flatMap(({ target }) => getDownstreamNodes(target))];
+    },
+    [getEdges],
+  );
 
-  return useCallback(getDownstreamNodes, [getDownstreamNodes, getEdges]);
+  return getDownstreamNodes;
 }
