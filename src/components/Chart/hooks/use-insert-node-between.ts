@@ -3,23 +3,11 @@ import { useReactFlow } from "reactflow";
 import { TaskNode, TaskStatus } from "../nodes/task-node/task-node.types";
 import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
 import { getTaskName } from "../config";
+import useGetDownstreamNodes from "./use-get-downstream-nodes";
 
 export default function useInsertNodeBetween() {
-  const { getEdge, getNode, getEdges, setNodes, setEdges } = useReactFlow();
-
-  const getDownstreamNodes = useCallback(
-    (initialNodeId: string): string[] => {
-      const edges = getEdges();
-      const startingEdges = edges.filter(({ source }) => source === initialNodeId);
-
-      if (!startingEdges.length) {
-        return [initialNodeId];
-      }
-
-      return [initialNodeId, ...startingEdges.flatMap(({ target }) => getDownstreamNodes(target))];
-    },
-    [getEdges],
-  );
+  const { getEdge, getNode, setNodes, setEdges } = useReactFlow();
+  const getDownstreamNodes = useGetDownstreamNodes();
 
   const insertNode = useCallback(
     (sourceNodeId: string, targetNodeId: string, edgeId: string) => {
