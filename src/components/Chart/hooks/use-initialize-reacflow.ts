@@ -18,6 +18,7 @@ import Dagre, { Label } from "@dagrejs/dagre";
 import { TaskNode, TaskNodeData, TaskStatus } from "../nodes/task-node/task-node.types";
 import getDownstreamTaskStatus from "../utils/get-downstream-task-status";
 import { getTaskName, initialEdges, initialNodes } from "../config";
+import useValidateFlow from "./use-validate-flow";
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction: string }) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
@@ -60,6 +61,7 @@ const getInitialFlow = (): { flow: { nodes: Node[]; edges: Edge[] }; updatedAt: 
 
 export default function useInitializeReacflow() {
   const { fitView, screenToFlowPosition, toObject, getNode } = useReactFlow();
+  const validateFlow = useValidateFlow();
   const connectingNodeId = useRef<string | null>(null);
 
   const { flow, updatedAt } = getInitialFlow();
@@ -71,6 +73,12 @@ export default function useInitializeReacflow() {
   useEffect(() => {
     localStorage.setItem("custom-flow", JSON.stringify({ flow: toObject(), updatedAt: new Date().getTime() }));
   }, [nodes, edges, toObject]);
+
+  // Handles validating flow
+  useEffect(() => {
+    const isValidFlow = validateFlow();
+    console.log({ isValidFlow });
+  }, [nodes, edges, validateFlow]);
 
   // Callbacks
   const onLayout = useCallback(() => {
